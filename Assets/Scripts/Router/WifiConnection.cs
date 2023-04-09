@@ -46,7 +46,7 @@ public class WifiConnection : MonoBehaviour
         if (!noPoweredRouters)
         {
             SetNoiseAlphaToClostestRouterDistance();
-            signalSlider.value = GetNormalizedDistance(2, maxDistanceFromRouter);
+            signalSlider.value = 1.0f - GetNormalizedDistance(2, maxDistanceFromRouter);
         }
         EndGame();
     }

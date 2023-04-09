@@ -21,9 +21,8 @@ public class ConnectionCreator : MonoBehaviour
     [Header("Path Obstruction")]
     public LayerMask obstacleLayers;
 
-    [Header("UI")]
-    public Image hasWireImage;
-    public TextMeshProUGUI descriptionText;
+    //[Header("UI")]
+    //public TextMeshProUGUI descriptionText;
 
     private void OnTriggerStay(Collider other)
     {
@@ -64,7 +63,6 @@ public class ConnectionCreator : MonoBehaviour
             distFromCurrentBox = Vector3.Distance(transform.position, currentBox.transform.position);
         }
         ButtonPressed();
-        UpdateUiImageColor();
         DrawLineToHand();
     }
 
@@ -76,15 +74,15 @@ public class ConnectionCreator : MonoBehaviour
             {
                 if (nearestBox.connectedFrom != null && nearestBox.connectedTo != null || nearestBox.connectsToComponent) { nearestBox.PlayCantClip(); return; }
                 nearestBox.PlayPickupWire();
-                UpdateUIText("Picked up wire");
+                //UpdateUIText("Picked up wire");
                 PickUpConnection(nearestBox);
             }
             else if (currentBox != null && currentBox != nearestBox && nearestBox != null && !nearestBox.hasPower)
             {
-                if (distFromCurrentBox >= maxWireLength) { UpdateUIText("Can't connect, to far away!"); nearestBox.PlayCantClip(); return; }
-                if (IsPathObstructed(nearestBox.transform.position, currentBox.transform.position, obstacleLayers)) { UpdateUIText("Path is Obstructed"); nearestBox.PlayCantClip(); return; }
+                if (distFromCurrentBox >= maxWireLength) { /*UpdateUIText("Can't connect, to far away!");*/ nearestBox.PlayCantClip(); return; }
+                if (IsPathObstructed(nearestBox.transform.position, currentBox.transform.position, obstacleLayers)) { /*UpdateUIText("Path is Obstructed");*/ nearestBox.PlayCantClip(); return; }
 
-                UpdateUIText("Box Connected");
+                //UpdateUIText("Box Connected");
                 if (!nearestBox.hasPower && currentBox.hasPower && nearestBox.connectedFrom != null)
                 {
                     nearestBox.SwapFromTo();
@@ -99,24 +97,24 @@ public class ConnectionCreator : MonoBehaviour
                 nearestBox.PlayDisconnectClip();
                 nearestBox.GetComponent<IElectricalBoxConnector>().ClearConnections();
 
-                UpdateUIText("Connections Cleared");
+                //UpdateUIText("Connections Cleared");
                 currentBox = null;
             }
             else
             {
                 currentBox = null;
                 nearestBox.PlayCantClip();
-                UpdateUIText("Let go of wire");
+                //UpdateUIText("Let go of wire");
             }
         }
         else if (Keyboard.current.eKey.wasPressedThisFrame && nearestRouter != null)
         {
             if (currentBox != null)
             {
-                if (distFromCurrentBox >= maxWireLength) { UpdateUIText("Can't connect, to far away!"); nearestBox.PlayCantClip(); return; }
+                if (distFromCurrentBox >= maxWireLength) { /*UpdateUIText("Can't connect, to far away!");*/ nearestBox.PlayCantClip(); return; }
 
                 currentBox.PlayConnectClip();
-                UpdateUIText("Connected Router");
+                //UpdateUIText("Connected Router");
                 nearestRouter.connectedFrom = currentBox;
                 currentBox.connectsToComponent = true;
                 currentBox = null;
@@ -124,7 +122,7 @@ public class ConnectionCreator : MonoBehaviour
             else if (nearestBox == null && nearestRouter.connectedFrom != null)
             {
                 nearestRouter.connectedFrom.PlayDisconnectClip();
-                UpdateUIText("Cleared Router Connection");
+                //UpdateUIText("Cleared Router Connection");
                 nearestRouter.connectedFrom.connectsToComponent = false;
                 nearestRouter.GetComponent<IRouterTasks>().ClearRouterConnection();
             }
@@ -133,10 +131,10 @@ public class ConnectionCreator : MonoBehaviour
         {
             if (currentBox != null)
             {
-                if (distFromCurrentBox >= maxWireLength) { UpdateUIText("Can't connect, to far away!"); nearestBox.PlayCantClip(); return; }
+                if (distFromCurrentBox >= maxWireLength) { /*UpdateUIText("Can't connect, to far away!");*/ nearestBox.PlayCantClip(); return; }
 
                 currentBox.PlayConnectClip();
-                UpdateUIText("Connected Component");
+                //UpdateUIText("Connected Component");
                 nearestComponent.connectedFrom = currentBox;
                 currentBox.connectsToComponent = true;
                 currentBox = null;
@@ -144,7 +142,7 @@ public class ConnectionCreator : MonoBehaviour
             else if (nearestBox == null && nearestComponent.connectedFrom != null)
             {
                 nearestComponent.connectedFrom.PlayDisconnectClip();
-                UpdateUIText("Cleared Component Connection");
+                //UpdateUIText("Cleared Component Connection");
                 nearestComponent.connectedFrom.connectsToComponent = false;
                 nearestComponent.GetComponent<IRouterTasks>().ClearRouterConnection(); //Component uses the IRouterTask since I didn't want to create a seperate Interface for it.
             }
@@ -153,16 +151,15 @@ public class ConnectionCreator : MonoBehaviour
         {
             currentBox.PlayCantClip();
             currentBox = null;
-            UpdateUIText("Let go of wire");
+            //UpdateUIText("Let go of wire");
         }
     }
 
     public bool IsPathObstructed(Vector3 pointA, Vector3 pointB, LayerMask mask)
     {
         Vector3 direction = pointB - pointA;
-        RaycastHit hit;
 
-        if (Physics.Raycast(pointA, direction.normalized, out hit, direction.magnitude, mask))
+        if (Physics.Raycast(pointA, direction.normalized, direction.magnitude, mask))
         {
             // If the raycast hit something, then the path is obstructed
             return true;
@@ -186,22 +183,10 @@ public class ConnectionCreator : MonoBehaviour
         }
     }
 
-    private void UpdateUIText(string desc)
-    {
-        descriptionText.text = desc;
-    }
-
-    private void UpdateUiImageColor()
-    {
-        if (currentBox != null)
-        {
-            hasWireImage.color = Color.green;
-        }
-        else
-        {
-            hasWireImage.color = Color.red;
-        }
-    }
+    //private void UpdateUIText(string desc)
+    //{
+    //    descriptionText.text = desc;
+    //}
 
     private void PickUpConnection(ElectricalBoxPower box)
     {
