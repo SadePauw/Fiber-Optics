@@ -15,6 +15,11 @@ public class ConnectionCreator : MonoBehaviour
     public ElectricalComponent nearestComponent;
     public LineRenderer lineRenderer;
     public Vector3 lineOffset;
+    public float maxWireLength;
+    public float distFromCurrentBox;
+
+    [Header("Path Obstruction")]
+    public LayerMask obstacleLayers;
 
     [Header("UI")]
     public Image hasWireImage;
@@ -54,6 +59,17 @@ public class ConnectionCreator : MonoBehaviour
     }
     private void Update()
     {
+        if (currentBox != null)
+        {
+            distFromCurrentBox = Vector3.Distance(transform.position, currentBox.transform.position);
+        }
+        ButtonPressed();
+        UpdateUiImageColor();
+        DrawLineToHand();
+    }
+
+    private void ButtonPressed()
+    {
         if (Keyboard.current.eKey.wasPressedThisFrame && nearestBox != null)
         {
             if (currentBox == null)
@@ -64,6 +80,8 @@ public class ConnectionCreator : MonoBehaviour
             }
             else if (currentBox != null && currentBox != nearestBox && nearestBox != null && !nearestBox.hasPower)
             {
+                if (distFromCurrentBox >= maxWireLength) { UpdateUIText("Can't connect, to far away!"); return; }
+                if (IsPathObstructed(nearestBox.transform.position, currentBox.transform.position, obstacleLayers)) { UpdateUIText("Path is Obstructed"); return; }
                 UpdateUIText("Box Connected");
                 if (!nearestBox.hasPower && currentBox.hasPower && nearestBox.connectedFrom != null)
                 {
@@ -73,7 +91,7 @@ public class ConnectionCreator : MonoBehaviour
                 currentBox.GetComponent<IElectricalBoxConnector>().SetConnectedBoxTo(nearestBox);
                 currentBox = null;
             }
-            else if(nearestBox == currentBox)
+            else if (nearestBox == currentBox)
             {
                 nearestBox.GetComponent<IElectricalBoxConnector>().ClearConnections();
                 UpdateUIText("Connections Cleared");
@@ -89,6 +107,7 @@ public class ConnectionCreator : MonoBehaviour
         {
             if (currentBox != null)
             {
+                if (distFromCurrentBox >= maxWireLength) { UpdateUIText("Can't connect, to far away!"); return; }
                 UpdateUIText("Connected Router");
                 nearestRouter.connectedFrom = currentBox;
                 currentBox.connectsToComponent = true;
@@ -97,7 +116,7 @@ public class ConnectionCreator : MonoBehaviour
             else if (nearestBox == null && nearestRouter.connectedFrom != null)
             {
                 UpdateUIText("Cleared Router Connection");
-                nearestBox.connectsToComponent = false;
+                nearestRouter.connectedFrom.connectsToComponent = false;
                 nearestRouter.GetComponent<IRouterTasks>().ClearRouterConnection();
             }
         }
@@ -105,6 +124,7 @@ public class ConnectionCreator : MonoBehaviour
         {
             if (currentBox != null)
             {
+                if (distFromCurrentBox >= maxWireLength) { UpdateUIText("Can't connect, to far away!"); return; }
                 UpdateUIText("Connected Component");
                 nearestComponent.connectedFrom = currentBox;
                 currentBox.connectsToComponent = true;
@@ -113,13 +133,30 @@ public class ConnectionCreator : MonoBehaviour
             else if (nearestBox == null && nearestComponent.connectedFrom != null)
             {
                 UpdateUIText("Cleared Component Connection");
-                nearestBox.connectsToComponent = false;
+                nearestComponent.connectedFrom.connectsToComponent = false;
                 nearestComponent.GetComponent<IRouterTasks>().ClearRouterConnection(); //Component uses the IRouterTask since I didn't want to create a seperate Interface for it.
             }
         }
+        else if (Keyboard.current.eKey.wasPressedThisFrame && currentBox != null)
+        {
+            currentBox = null;
+            UpdateUIText("Let go of wire");
+        }
+    }
 
-        UpdateUiImageColor();
-        DrawLineToHand();
+    public bool IsPathObstructed(Vector3 pointA, Vector3 pointB, LayerMask mask)
+    {
+        Vector3 direction = pointB - pointA;
+        RaycastHit hit;
+
+        if (Physics.Raycast(pointA, direction.normalized, out hit, direction.magnitude, mask))
+        {
+            // If the raycast hit something, then the path is obstructed
+            return true;
+        }
+
+        // Otherwise, the path is not obstructed
+        return false;
     }
 
     private void DrawLineToHand()
