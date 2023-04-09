@@ -29,7 +29,7 @@ public class WifiConnection : MonoBehaviour
     public float distToClosestRouterNormalized;
     private bool endGame = false;
     private AudioSource source;
-
+    private bool noPoweredRouters = false;
 
     private void Awake()
     {
@@ -44,14 +44,17 @@ public class WifiConnection : MonoBehaviour
 
     private void Update()
     {
-        SetNoiseAlphaToClostestRouterDistance();
-        signalSlider.value = GetNormalizedDistance(2, maxDistanceFromRouter);
+        if (!noPoweredRouters)
+        {
+            SetNoiseAlphaToClostestRouterDistance();
+            signalSlider.value = GetNormalizedDistance(2, maxDistanceFromRouter);
+        }
         EndGame();
     }
 
     private void EndGame()
     {
-        if (distToClosestRouter >= maxDistanceFromRouter && !endGame)
+        if (distToClosestRouter >= maxDistanceFromRouter && !endGame || noPoweredRouters && !endGame)
         {
             StartCoroutine(EndRoutine());
         }
@@ -59,6 +62,8 @@ public class WifiConnection : MonoBehaviour
 
     private IEnumerator EndRoutine()
     {
+        SetNoiseAlpha(1);
+        signalSlider.value = 1;
         endGame = true;
         source.PlayOneShot(sipClips[Random.Range(0, sipClips.Length)]);
         yield return new WaitForSeconds(waitForEnd);
@@ -67,9 +72,12 @@ public class WifiConnection : MonoBehaviour
 
     private void SetNoiseAlphaToClostestRouterDistance()
     {
-        distToClosestRouter = Vector3.Distance(transform.position, GetClosestRouter().transform.position);
-        distToClosestRouterNormalized = GetNormalizedDistance(minDistanceFromRouter, maxDistanceFromRouter);
-        SetNoiseAlpha(distToClosestRouterNormalized);
+        if (GetClosestRouter() != null)
+        {
+            distToClosestRouter = Vector3.Distance(transform.position, GetClosestRouter().transform.position);
+            distToClosestRouterNormalized = GetNormalizedDistance(minDistanceFromRouter, maxDistanceFromRouter);
+            SetNoiseAlpha(distToClosestRouterNormalized);
+        }
     }
     private void SetNoiseAlpha(float value)
     {
@@ -89,7 +97,7 @@ public class WifiConnection : MonoBehaviour
         float distance = 99999;
         foreach (var router in routers)
         {
-            router.GetComponent<IRouterTasks>().SetRouterMaterial(false); //<-- Fix this
+            router.GetComponent<IRouterTasks>().SetRouterMaterial(false);
             if (!router.hasPower) { continue; }
             float dist;
             dist = Vector3.Distance(transform.position, router.transform.position);
@@ -99,7 +107,12 @@ public class WifiConnection : MonoBehaviour
                 closestRouter = router;
             }
         }
-        closestRouter.GetComponent<IRouterTasks>().SetRouterMaterial(true);
-        return closestRouter.gameObject;
+        if (closestRouter != null)
+        {
+            closestRouter.GetComponent<IRouterTasks>().SetRouterMaterial(true);
+            return closestRouter.gameObject;
+        }
+        noPoweredRouters = true;
+        return null;
     }
 }

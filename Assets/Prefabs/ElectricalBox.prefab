@@ -116,10 +116,13 @@ MonoBehaviour:
   hasInfinitePower: 1
   connectedFrom: {fileID: 0}
   connectedTo: {fileID: 0}
+  connectedRouter: {fileID: 0}
   powerRenderer: {fileID: 6682658082802933984}
   powered: {fileID: 2100000, guid: 30c5ae20a841ba748a387f816ea74361, type: 2}
   notPowered: {fileID: 2100000, guid: 75276cb4da6a6d04db102f8be6221fef, type: 2}
   lineRenderer: {fileID: 0}
+  poweredMaterial: {fileID: 2100000, guid: 93880a6034e0d814b914227535d259cf, type: 2}
+  notPoweredMaterial: {fileID: 2100000, guid: fcc98e3203bd77647a1b6925d2bffd88, type: 2}
   hasPower: 0
 --- !u!65 &7165154889504667983
 BoxCollider:

@@ -12,11 +12,13 @@ public class ConnectionCreator : MonoBehaviour
     public ElectricalBoxPower currentBox;
     public ElectricalBoxPower nearestBox;
     public Router nearestRouter;
+    public ElectricalComponent nearestComponent;
+    public LineRenderer lineRenderer;
+    public Vector3 lineOffset;
 
     [Header("UI")]
     public Image hasWireImage;
     public TextMeshProUGUI descriptionText;
-
 
     private void OnTriggerStay(Collider other)
     {
@@ -29,16 +31,26 @@ public class ConnectionCreator : MonoBehaviour
         {
             nearestRouter = other.gameObject.GetComponent<Router>();
         }
+
+        if (other.gameObject.layer == LayerMask.NameToLayer("Component"))
+        {
+            nearestComponent = other.gameObject.GetComponent<ElectricalComponent>();
+        }
     }
 
     private void OnTriggerExit(Collider other)
     {
         nearestBox = null;
         nearestRouter = null;
+        nearestComponent = null;
     }
 
     private void Start()
     {
+        lineRenderer = GetComponent<LineRenderer>();
+        lineRenderer.positionCount = 2;
+        lineRenderer.startWidth = 0.1f;
+        lineRenderer.endWidth = 0.1f;
     }
     private void Update()
     {
@@ -46,20 +58,19 @@ public class ConnectionCreator : MonoBehaviour
         {
             if (currentBox == null)
             {
+                if (nearestBox.connectedFrom != null && nearestBox.connectedTo != null || nearestBox.connectsToComponent) { return; }
                 UpdateUIText("Picked up wire");
                 PickUpConnection(nearestBox);
             }
-            else if (currentBox != null && currentBox != nearestBox && nearestBox != null)
+            else if (currentBox != null && currentBox != nearestBox && nearestBox != null && !nearestBox.hasPower)
             {
                 UpdateUIText("Box Connected");
                 if (!nearestBox.hasPower && currentBox.hasPower && nearestBox.connectedFrom != null)
                 {
-                    Debug.Log("Check Swap");
                     nearestBox.SwapFromTo();
                 }
                 nearestBox.GetComponent<IElectricalBoxConnector>().SetConnectedBoxFrom(currentBox);
                 currentBox.GetComponent<IElectricalBoxConnector>().SetConnectedBoxTo(nearestBox);
-
                 currentBox = null;
             }
             else if(nearestBox == currentBox)
@@ -80,15 +91,49 @@ public class ConnectionCreator : MonoBehaviour
             {
                 UpdateUIText("Connected Router");
                 nearestRouter.connectedFrom = currentBox;
+                currentBox.connectsToComponent = true;
+                currentBox = null;
             }
-            if (nearestBox != null && nearestRouter.connectedFrom != null)
+            else if (nearestBox == null && nearestRouter.connectedFrom != null)
             {
                 UpdateUIText("Cleared Router Connection");
+                nearestBox.connectsToComponent = false;
                 nearestRouter.GetComponent<IRouterTasks>().ClearRouterConnection();
+            }
+        }
+        else if (Keyboard.current.eKey.wasPressedThisFrame && nearestComponent != null)
+        {
+            if (currentBox != null)
+            {
+                UpdateUIText("Connected Component");
+                nearestComponent.connectedFrom = currentBox;
+                currentBox.connectsToComponent = true;
+                currentBox = null;
+            }
+            else if (nearestBox == null && nearestComponent.connectedFrom != null)
+            {
+                UpdateUIText("Cleared Component Connection");
+                nearestBox.connectsToComponent = false;
+                nearestComponent.GetComponent<IRouterTasks>().ClearRouterConnection(); //Component uses the IRouterTask since I didn't want to create a seperate Interface for it.
             }
         }
 
         UpdateUiImageColor();
+        DrawLineToHand();
+    }
+
+    private void DrawLineToHand()
+    {
+        if (currentBox != null)
+        {
+            lineRenderer.positionCount = 2;
+            lineRenderer.SetPosition(0, transform.position + lineOffset);
+            lineRenderer.SetPosition(1, currentBox.transform.position);
+        }
+        else
+        {
+            lineRenderer.positionCount = 0;
+        }
     }
 
     private void UpdateUIText(string desc)

@@ -9,6 +9,7 @@ public class ElectricalBoxPower : MonoBehaviour, IElectricalBoxConnector
     [Header("Connections")]
     public ElectricalBoxPower connectedFrom;
     public ElectricalBoxPower connectedTo;
+    public bool connectsToComponent;
 
     public Router connectedRouter;
 
@@ -19,6 +20,8 @@ public class ElectricalBoxPower : MonoBehaviour, IElectricalBoxConnector
 
     [Header("Line Renderer")]
     public LineRenderer lineRenderer;
+    public Material poweredMaterial;
+    public Material notPoweredMaterial;
 
     //Cache
     public bool hasPower;
@@ -29,8 +32,6 @@ public class ElectricalBoxPower : MonoBehaviour, IElectricalBoxConnector
         lineRenderer.positionCount = 2;
         lineRenderer.startWidth = 0.1f;
         lineRenderer.endWidth = 0.1f;
-
-
 
         if (hasInfinitePower)
         {
@@ -56,6 +57,15 @@ public class ElectricalBoxPower : MonoBehaviour, IElectricalBoxConnector
             lineRenderer.SetPosition(0, transform.position);
             lineRenderer.SetPosition(1, connectedTo.transform.position);
         }
+
+        if (hasPower)
+        {
+            lineRenderer.material = poweredMaterial;
+        }
+        else
+        {
+            lineRenderer.material = notPoweredMaterial;
+        }
     }
 
     public void ConnectToRouter(Router router)
@@ -67,29 +77,27 @@ public class ElectricalBoxPower : MonoBehaviour, IElectricalBoxConnector
     {
         if (hasInfinitePower)
         {
-            Debug.Log("Can't connect to a power source.");
+            //Debug.Log("Can't connect to a power source.");
             return;
         }
-        if (connectedFrom != null) { Debug.Log("Box already has connectedFrom"); return; }
+        if (connectedFrom != null) { /*Debug.Log("Box already has connectedFrom")*/; return; }
         connectedFrom = box;
     }
 
     public void SetConnectedBoxTo(ElectricalBoxPower box)
     {
-        if (connectedTo != null || box.hasInfinitePower) { Debug.Log("Box already has connectedTo or is a power source"); return; }
+        if (connectedTo != null || box.hasInfinitePower) { /*Debug.Log("Box already has connectedTo or is a power source")*/; return; }
         connectedTo = box;
     }
 
     public void SwapFromTo()
     {
-        Debug.Log("swap");
+        //Debug.Log("swap");
         if (connectedFrom != null && connectedFrom != this) //<-- connectodFrom != this ??
         {
             connectedFrom.SwapFromTo();
         }
-        var temp = connectedTo;
-        connectedTo = connectedFrom;
-        connectedFrom = temp;
+        (connectedFrom, connectedTo) = (connectedTo, connectedFrom);
     }
 
     public void ClearConnections()
@@ -133,8 +141,6 @@ public class ElectricalBoxPower : MonoBehaviour, IElectricalBoxConnector
 
     private void CheckPower()
     {
-        Debug.Log("Checking power for: " + this.name);
-
         if (connectedFrom != null)
         {
             hasPower = connectedFrom.hasPower;

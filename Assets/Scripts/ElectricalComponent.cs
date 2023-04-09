@@ -1,17 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
-public class Router : MonoBehaviour, IRouterTasks
+public class ElectricalComponent : MonoBehaviour, IRouterTasks
 {
     public bool _isOnline;
     public ElectricalBoxPower connectedFrom;
     public bool hasPower = false;
+    public GameObject componentToSwitch;
 
     public Material connectedMaterial;
     public Material disconnectedMaterial;
-    public Material inactiveMaterial;
 
     [Header("Line Renderer")]
     public LineRenderer lineRenderer;
@@ -21,6 +20,7 @@ public class Router : MonoBehaviour, IRouterTasks
 
 
     private Renderer myRenderer;
+    private bool doOnce;
 
     private void Awake()
     {
@@ -60,7 +60,27 @@ public class Router : MonoBehaviour, IRouterTasks
         {
             lineRenderer.material = notPoweredMaterial;
         }
+
+        TriggerComponent();
+        SetRouterMaterial(hasPower);
     }
+
+    public void TriggerComponent()
+    {
+        if(hasPower && !doOnce)
+        {
+            doOnce = true;
+            Debug.Log("Component triggered on");
+            //componentToSwitch.GetComponent<IComponent>().TriggerComponent(true);
+        }
+        else if (!hasPower && doOnce) { }
+        {
+            doOnce = false;
+            Debug.Log("Component triggered off");
+            //componentToSwitch.GetComponent<IComponent>().TriggerComponent(false);
+        }
+    }
+
 
     public void ClearRouterConnection()
     {
@@ -81,11 +101,6 @@ public class Router : MonoBehaviour, IRouterTasks
             {
                 myRenderer.material = disconnectedMaterial;
             }
-            else
-            {
-                myRenderer.material = inactiveMaterial;
-            }
         }
-        _isOnline = isOnline;
     }
 }

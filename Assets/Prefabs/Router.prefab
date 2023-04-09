@@ -7703,7 +7703,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 3019
+  m_VersionIndex: 3037
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -7800,13 +7800,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b41879daae639bb4783ba82aa61621f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isConnected: 0
+  _isOnline: 0
   connectedFrom: {fileID: 0}
   hasPower: 0
   connectedMaterial: {fileID: 2100000, guid: 62c9aa9eeae3c6f488fbd5e8461a7663, type: 2}
-  DisconnectedMaterial: {fileID: 2100000, guid: c03e302ad578bd74cb3cf90bca01d93d,
+  disconnectedMaterial: {fileID: 2100000, guid: c03e302ad578bd74cb3cf90bca01d93d,
     type: 2}
+  inactiveMaterial: {fileID: 2100000, guid: 34b50a89e3543ac4b8e433fe8b2e7fb4, type: 2}
   lineRenderer: {fileID: 0}
+  offset: {x: -0.4, y: 0.5, z: -0.45}
+  poweredMaterial: {fileID: 2100000, guid: 93880a6034e0d814b914227535d259cf, type: 2}
+  notPoweredMaterial: {fileID: 2100000, guid: fcc98e3203bd77647a1b6925d2bffd88, type: 2}
 --- !u!65 &4502838717248316731
 BoxCollider:
   m_ObjectHideFlags: 0
