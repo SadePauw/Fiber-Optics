@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 6682658081856246582}
   - component: {fileID: 7165154889504667983}
   - component: {fileID: 8065645654428078871}
+  - component: {fileID: 552582841}
   m_Layer: 10
   m_Name: ElectricalBox
   m_TagString: Untagged
@@ -116,6 +117,7 @@ MonoBehaviour:
   hasInfinitePower: 1
   connectedFrom: {fileID: 0}
   connectedTo: {fileID: 0}
+  connectsToComponent: 0
   connectedRouter: {fileID: 0}
   powerRenderer: {fileID: 6682658082802933984}
   powered: {fileID: 2100000, guid: 30c5ae20a841ba748a387f816ea74361, type: 2}
@@ -123,6 +125,15 @@ MonoBehaviour:
   lineRenderer: {fileID: 0}
   poweredMaterial: {fileID: 2100000, guid: 93880a6034e0d814b914227535d259cf, type: 2}
   notPoweredMaterial: {fileID: 2100000, guid: fcc98e3203bd77647a1b6925d2bffd88, type: 2}
+  source: {fileID: 0}
+  connectWire:
+  - {fileID: 8300000, guid: df724678564a42d4fa6e935c4cebf1b6, type: 3}
+  disconnectWire:
+  - {fileID: 8300000, guid: 59b5a86cd54c81c429ed09075a34602b, type: 3}
+  cantConnect:
+  - {fileID: 8300000, guid: db2d668ff9fc02e46a200c2eb1dda9cf, type: 3}
+  pickupWire:
+  - {fileID: 8300000, guid: 7b9ec6697aec1ea47af940714cc22a65, type: 3}
   hasPower: 0
 --- !u!65 &7165154889504667983
 BoxCollider:
@@ -236,6 +247,103 @@ LineRenderer:
     generateLightingData: 1
   m_UseWorldSpace: 1
   m_Loop: 0
+--- !u!82 &552582841
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6682658081856246581}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 2895305979046923315, guid: 7d5503d2beedc324aac514f28b498858,
+    type: 2}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &6682658082802933999
 GameObject:
   m_ObjectHideFlags: 0
@@ -247,7 +355,7 @@ GameObject:
   - component: {fileID: 6682658082802933987}
   - component: {fileID: 6682658082802933986}
   - component: {fileID: 6682658082802933984}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: PowerSource
   m_TagString: Untagged
   m_Icon: {fileID: 0}

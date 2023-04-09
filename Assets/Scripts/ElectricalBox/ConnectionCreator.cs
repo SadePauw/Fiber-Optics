@@ -74,32 +74,38 @@ public class ConnectionCreator : MonoBehaviour
         {
             if (currentBox == null)
             {
-                if (nearestBox.connectedFrom != null && nearestBox.connectedTo != null || nearestBox.connectsToComponent) { return; }
+                if (nearestBox.connectedFrom != null && nearestBox.connectedTo != null || nearestBox.connectsToComponent) { nearestBox.PlayCantClip(); return; }
+                nearestBox.PlayPickupWire();
                 UpdateUIText("Picked up wire");
                 PickUpConnection(nearestBox);
             }
             else if (currentBox != null && currentBox != nearestBox && nearestBox != null && !nearestBox.hasPower)
             {
-                if (distFromCurrentBox >= maxWireLength) { UpdateUIText("Can't connect, to far away!"); return; }
-                if (IsPathObstructed(nearestBox.transform.position, currentBox.transform.position, obstacleLayers)) { UpdateUIText("Path is Obstructed"); return; }
+                if (distFromCurrentBox >= maxWireLength) { UpdateUIText("Can't connect, to far away!"); nearestBox.PlayCantClip(); return; }
+                if (IsPathObstructed(nearestBox.transform.position, currentBox.transform.position, obstacleLayers)) { UpdateUIText("Path is Obstructed"); nearestBox.PlayCantClip(); return; }
+
                 UpdateUIText("Box Connected");
                 if (!nearestBox.hasPower && currentBox.hasPower && nearestBox.connectedFrom != null)
                 {
                     nearestBox.SwapFromTo();
                 }
+                nearestBox.PlayConnectClip();
                 nearestBox.GetComponent<IElectricalBoxConnector>().SetConnectedBoxFrom(currentBox);
                 currentBox.GetComponent<IElectricalBoxConnector>().SetConnectedBoxTo(nearestBox);
                 currentBox = null;
             }
             else if (nearestBox == currentBox)
             {
+                nearestBox.PlayDisconnectClip();
                 nearestBox.GetComponent<IElectricalBoxConnector>().ClearConnections();
+
                 UpdateUIText("Connections Cleared");
                 currentBox = null;
             }
             else
             {
                 currentBox = null;
+                nearestBox.PlayCantClip();
                 UpdateUIText("Let go of wire");
             }
         }
@@ -107,7 +113,9 @@ public class ConnectionCreator : MonoBehaviour
         {
             if (currentBox != null)
             {
-                if (distFromCurrentBox >= maxWireLength) { UpdateUIText("Can't connect, to far away!"); return; }
+                if (distFromCurrentBox >= maxWireLength) { UpdateUIText("Can't connect, to far away!"); nearestBox.PlayCantClip(); return; }
+
+                currentBox.PlayConnectClip();
                 UpdateUIText("Connected Router");
                 nearestRouter.connectedFrom = currentBox;
                 currentBox.connectsToComponent = true;
@@ -115,6 +123,7 @@ public class ConnectionCreator : MonoBehaviour
             }
             else if (nearestBox == null && nearestRouter.connectedFrom != null)
             {
+                nearestRouter.connectedFrom.PlayDisconnectClip();
                 UpdateUIText("Cleared Router Connection");
                 nearestRouter.connectedFrom.connectsToComponent = false;
                 nearestRouter.GetComponent<IRouterTasks>().ClearRouterConnection();
@@ -124,7 +133,9 @@ public class ConnectionCreator : MonoBehaviour
         {
             if (currentBox != null)
             {
-                if (distFromCurrentBox >= maxWireLength) { UpdateUIText("Can't connect, to far away!"); return; }
+                if (distFromCurrentBox >= maxWireLength) { UpdateUIText("Can't connect, to far away!"); nearestBox.PlayCantClip(); return; }
+
+                currentBox.PlayConnectClip();
                 UpdateUIText("Connected Component");
                 nearestComponent.connectedFrom = currentBox;
                 currentBox.connectsToComponent = true;
@@ -132,6 +143,7 @@ public class ConnectionCreator : MonoBehaviour
             }
             else if (nearestBox == null && nearestComponent.connectedFrom != null)
             {
+                nearestComponent.connectedFrom.PlayDisconnectClip();
                 UpdateUIText("Cleared Component Connection");
                 nearestComponent.connectedFrom.connectsToComponent = false;
                 nearestComponent.GetComponent<IRouterTasks>().ClearRouterConnection(); //Component uses the IRouterTask since I didn't want to create a seperate Interface for it.
@@ -139,6 +151,7 @@ public class ConnectionCreator : MonoBehaviour
         }
         else if (Keyboard.current.eKey.wasPressedThisFrame && currentBox != null)
         {
+            currentBox.PlayCantClip();
             currentBox = null;
             UpdateUIText("Let go of wire");
         }

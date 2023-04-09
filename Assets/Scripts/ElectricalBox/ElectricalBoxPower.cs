@@ -23,11 +23,19 @@ public class ElectricalBoxPower : MonoBehaviour, IElectricalBoxConnector
     public Material poweredMaterial;
     public Material notPoweredMaterial;
 
+    [Header("Audio")]
+    public AudioSource source;
+    public AudioClip[] connectWire;
+    public AudioClip[] disconnectWire;
+    public AudioClip[] cantConnect;
+    public AudioClip[] pickupWire;
+
     //Cache
     public bool hasPower;
 
     private void Start()
     {
+        source = GetComponent<AudioSource>();
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.positionCount = 2;
         lineRenderer.startWidth = 0.1f;
@@ -163,5 +171,32 @@ public class ElectricalBoxPower : MonoBehaviour, IElectricalBoxConnector
                 powerRenderer.material = notPowered;
             }
         }
+    }
+
+    public void PlayConnectClip()
+    {
+        source.pitch = Random.Range(0.8f, 1.2f);
+        source.PlayOneShot(PickRandomTrack(connectWire));
+    }
+    public void PlayCantClip()
+    {
+        source.pitch = Random.Range(0.8f, 1.2f);
+        source.PlayOneShot(PickRandomTrack(cantConnect));
+    }
+    public void PlayDisconnectClip()
+    {
+        source.pitch = Random.Range(0.8f, 1.2f);
+        source.PlayOneShot(PickRandomTrack(disconnectWire));
+    }
+    public void PlayPickupWire()
+    {
+        source.pitch = Random.Range(0.8f, 1.2f);
+        source.PlayOneShot(PickRandomTrack(pickupWire));
+    }
+
+    private AudioClip PickRandomTrack(AudioClip[] clips)
+    {
+        int randomIndex = Random.Range(0, clips.Length);
+        return clips[randomIndex];
     }
 }

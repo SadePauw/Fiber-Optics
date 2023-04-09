@@ -16,8 +16,8 @@ public class WifiConnection : MonoBehaviour
     public Slider signalSlider;
 
     [Header("Audio")]
-    public AudioClip[] sipClips;
-
+    public AudioSource source;
+    public AudioClip[] LoseGame;
 
     [Header("Read Only")]
     public float distToClosestRouter;
@@ -28,7 +28,6 @@ public class WifiConnection : MonoBehaviour
     //Cache
     public float distToClosestRouterNormalized;
     private bool endGame = false;
-    private AudioSource source;
     private bool noPoweredRouters = false;
 
     private void Awake()
@@ -65,7 +64,7 @@ public class WifiConnection : MonoBehaviour
         SetNoiseAlpha(1);
         signalSlider.value = 1;
         endGame = true;
-        source.PlayOneShot(sipClips[Random.Range(0, sipClips.Length)]);
+        source.PlayOneShot(LoseGame[Random.Range(0, LoseGame.Length)]);
         yield return new WaitForSeconds(waitForEnd);
         FindObjectOfType<LevelLoader>().RestartScene();
     }

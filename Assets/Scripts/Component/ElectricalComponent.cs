@@ -8,7 +8,7 @@ public class ElectricalComponent : MonoBehaviour, IRouterTasks
     public bool _isOnline;
     public ElectricalBoxPower connectedFrom;
     public bool hasPower = false;
-    public GameObject componentToSwitch;
+    public GameObject[] componentToSwitch;
 
     public Material connectedMaterial;
     public Material disconnectedMaterial;
@@ -18,7 +18,6 @@ public class ElectricalComponent : MonoBehaviour, IRouterTasks
     public Vector3 offset;
     public Material poweredMaterial;
     public Material notPoweredMaterial;
-
 
     private Renderer myRenderer;
     private bool doOnce;
@@ -73,13 +72,19 @@ public class ElectricalComponent : MonoBehaviour, IRouterTasks
         {
             doOnce = true;
             Debug.Log("Component triggered on");
-            componentToSwitch.GetComponent<IComponent>().TriggerComponentTrue();
+            foreach (var component in componentToSwitch)
+            {
+                component.GetComponent<IComponent>().TriggerComponentTrue();
+            }
         }
         else if (!hasPower && doOnce)
         {
             doOnce = false;
             Debug.Log("Component triggered off");
-            componentToSwitch.GetComponent<IComponent>().TriggerComponentFalse();
+            foreach (var component in componentToSwitch)
+            {
+                component.GetComponent<IComponent>().TriggerComponentFalse();
+            }
         }
     }
 
