@@ -36,6 +36,7 @@ public class Finish : MonoBehaviour, IComponent
         var clip = PickRandomTrack(finishGameClips);
         source.PlayOneShot(clip);
         yield return new WaitForSeconds(clip.length);
+        Cursor.lockState = CursorLockMode.None;
         FindObjectOfType<LevelLoader>().LoadMainMenuScene();
     }
 

@@ -66,7 +66,8 @@ public class WifiConnection : MonoBehaviour
         endGame = true;
         source.PlayOneShot(LoseGame[Random.Range(0, LoseGame.Length)]);
         yield return new WaitForSeconds(waitForEnd);
-        FindObjectOfType<LevelLoader>().RestartScene();
+        Cursor.lockState = CursorLockMode.None;
+        FindObjectOfType<LevelLoader>().LoadMainMenuScene();
     }
 
     private void SetNoiseAlphaToClostestRouterDistance()
